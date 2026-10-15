@@ -172,7 +172,7 @@ const App = () => {
       case VIEWS.DASHBOARD:
         return (
           <>
-            <StatsCards data={apiData} />
+            <StatsCards data={apiData} onNavigate={setCurrentView} VIEWS={VIEWS} />
             {apiData.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 <div className="lg:col-span-2 w-full bg-gray-800/90 border border-gray-700/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
