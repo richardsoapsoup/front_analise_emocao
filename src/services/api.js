@@ -23,6 +23,7 @@ export const api = {
   deleteCamera: (id) => request(`/cameras/${id}`, { method: 'DELETE' }),
   startCamera: (id) => request(`/cameras/${id}/start`, { method: 'POST' }),
   stopCamera: (id) => request(`/cameras/${id}/stop`, { method: 'POST' }),
+  releaseCamera: (id) => request(`/cameras/${id}/release`, { method: 'POST' }),
   updateCameraMode: (id, modo) => request(`/cameras/${id}/modo?modo_monitoramento=${modo}`, { method: 'PUT' }),
   videoFeedUrl: (id) => `${API_BASE_URL}/video_feed/${id}`,
 };
