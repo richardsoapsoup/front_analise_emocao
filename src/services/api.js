@@ -26,4 +26,11 @@ export const api = {
   releaseCamera: (id) => request(`/cameras/${id}/release`, { method: 'POST' }),
   updateCameraMode: (id, modo) => request(`/cameras/${id}/modo?modo_monitoramento=${modo}`, { method: 'PUT' }),
   videoFeedUrl: (id) => `${API_BASE_URL}/video_feed/${id}`,
+  getAlertas: (limit = 50, status = null) => request(`/alertas?limit=${limit}${status ? `&status=${status}` : ''}`),
+  updateAlertaStatus: (id, status) => request(`/alertas/${id}/status?status=${status}`, { method: 'PUT' }),
+  deleteAlerta: (id) => request(`/alertas/${id}`, { method: 'DELETE' }),
+  getAlertasConfig: () => request('/alertas/config'),
+  updateAlertasConfig: (payload) => request('/alertas/config', { method: 'PUT', body: JSON.stringify(payload) }),
+  testarAlerta: () => request('/alertas/testar', { method: 'POST' }),
+  alertaImageUrl: (url) => url ? `${API_BASE_URL}${url}` : null,
 };

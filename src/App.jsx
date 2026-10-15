@@ -8,6 +8,7 @@ import { BehaviorChart } from './components/charts/BehaviorChart';
 import Relatorio from './components/Relatorio';
 import { CamerasMonitor } from './components/CamerasMonitor';
 import { Usuarios } from './components/Usuarios';
+import { AlertasManager } from './components/AlertasManager';
 import { api } from './services/api';
 import './config/chartConfig';
 import {
@@ -23,6 +24,7 @@ import {
 const VIEWS = {
   DASHBOARD: 'dashboard',
   CAMERAS: 'cameras',
+  ALERTAS: 'alertas',
   USUARIOS: 'usuarios',
   RELATORIOS: 'relatorios',
   CONFIGURACOES: 'configuracoes',
@@ -31,6 +33,7 @@ const VIEWS = {
 const VIEW_TITLES = {
   [VIEWS.DASHBOARD]: { title: 'Dashboard Geral', subtitle: 'Métricas e tendências emocionais em tempo real' },
   [VIEWS.CAMERAS]: { title: 'Central de Câmeras', subtitle: 'Transmissão e monitoramento dos feeds de vídeo' },
+  [VIEWS.ALERTAS]: { title: 'Alertas de Raiva Extrema', subtitle: 'Evidências visuais em tempo real e notificações automáticas por e-mail' },
   [VIEWS.USUARIOS]: { title: 'Gestão de Usuários', subtitle: 'Controle organizacional de membros e departamentos' },
   [VIEWS.RELATORIOS]: { title: 'Relatórios Analíticos', subtitle: 'Indicadores agregados e comportamento consolidado' },
   [VIEWS.CONFIGURACOES]: { title: 'Configurações', subtitle: 'Parâmetros do sistema e integrações' },
@@ -44,8 +47,31 @@ const App = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [toast, setToast] = useState(null);
+  const [alertCount, setAlertCount] = useState(0);
 
   const { emotionData, behaviorData } = useDataProcessing(apiData);
+
+  // Som sutil de alerta via Web Audio API (dispensa arquivos externos)
+  const playAlertSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.35);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch (e) {
+      console.warn('Áudio de alerta indisponível ou bloqueado pelo navegador:', e);
+    }
+  };
 
   // Relógio do Header
   useEffect(() => {
@@ -63,8 +89,43 @@ const App = () => {
     setToast({ message, type });
     setTimeout(() => {
       setToast((prev) => (prev?.message === message ? null : prev));
-    }, 4000);
+    }, 4500);
   };
+
+  // Monitoramento contínuo de novos alertas de raiva extrema (em background)
+  useEffect(() => {
+    let seenAlertIds = new Set();
+    let isInitialLoad = true;
+
+    const checkAlerts = async () => {
+      try {
+        const data = await api.getAlertas(20);
+        const novos = data.filter((a) => a.status === 'novo');
+        setAlertCount(novos.length);
+
+        if (!isInitialLoad) {
+          const freshAlerts = data.filter((a) => a.status === 'novo' && !seenAlertIds.has(a.id));
+          if (freshAlerts.length > 0) {
+            const first = freshAlerts[0];
+            playAlertSound();
+            showToast(
+              `🚨 Alerta de Raiva Extrema (${(first.score_raiva * 100).toFixed(0)}%) detectado na ${first.camera_nome || 'Câmera'}!`,
+              'error'
+            );
+          }
+        }
+
+        seenAlertIds = new Set(data.map((a) => a.id));
+        isInitialLoad = false;
+      } catch {
+        // Silencioso em caso de erro transitório de rede
+      }
+    };
+
+    checkAlerts();
+    const interval = setInterval(checkAlerts, 6000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -111,7 +172,7 @@ const App = () => {
       case VIEWS.DASHBOARD:
         return (
           <>
-            <StatsCards data={apiData} />
+            <StatsCards data={apiData} onNavigate={setCurrentView} VIEWS={VIEWS} />
             {apiData.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 <div className="lg:col-span-2 w-full bg-gray-800/90 border border-gray-700/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
@@ -137,6 +198,13 @@ const App = () => {
         );
       case VIEWS.CAMERAS:
         return <CamerasMonitor onNotify={showToast} />;
+      case VIEWS.ALERTAS:
+        return (
+          <AlertasManager
+            onNotify={showToast}
+            onNewAlertCountChange={setAlertCount}
+          />
+        );
       case VIEWS.USUARIOS:
         return <Usuarios onNotify={showToast} />;
       case VIEWS.RELATORIOS:
@@ -173,6 +241,7 @@ const App = () => {
         VIEWS={VIEWS}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
+        alertCount={alertCount}
       />
 
       {/* Conteúdo Principal com Topbar Header */}

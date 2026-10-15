@@ -92,15 +92,34 @@ export const CamerasMonitor = ({ onNotify = () => {} }) => {
 
   const confirmDelete = async () => {
     if (!cameraToDelete) return;
+    const cam = cameraToDelete;
+    // 1. Fecha o modal imediatamente
+    setCameraToDelete(null);
+    if (expandedCamera?._id === cam._id) {
+      setExpandedCamera(null);
+    }
+    // 2. Desmonta o stream e remove localmente da tela de imediato
+    setActiveFeeds((prev) => {
+      const next = { ...prev };
+      delete next[cam._id];
+      return next;
+    });
+    setCameras((prev) => prev.filter((c) => c._id !== cam._id));
+
     try {
-      await api.deleteCamera(cameraToDelete._id);
-      if (expandedCamera?._id === cameraToDelete._id) setExpandedCamera(null);
-      setCameraToDelete(null);
-      onNotify(`Câmera "${cameraToDelete.nome}" removida.`, 'info');
-      await loadCameras();
+      // 3. Libera o hardware da webcam e deleta a câmera
+      try {
+        await api.releaseCamera(cam._id);
+      } catch {
+        // ignora se já tiver sido encerrada
+      }
+      await api.deleteCamera(cam._id);
+      onNotify(`Câmera "${cam.nome}" removida com sucesso.`, 'info');
     } catch (error) {
       console.error(error);
-      onNotify('Erro ao remover câmera.', 'error');
+      onNotify('Erro ao remover câmera no servidor.', 'error');
+    } finally {
+      await loadCameras();
     }
   };
 
