@@ -12,11 +12,13 @@ export const useDataProcessing = (apiData = []) => {
 
     const emotionData = Object.entries(emotionCounts).map(([name, value]) => ({
         name,
+        label: name,
         value,
     }));
 
     const behaviorData = Object.entries(behaviorCounts).map(([name, value]) => ({
         name,
+        label: name,
         value,
     }));
 

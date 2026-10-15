@@ -6,7 +6,6 @@ import {
   Cog6ToothIcon,
   ChartPieIcon,
   UsersIcon,
-  VideoCameraIcon,
 } from "@heroicons/react/24/outline";
 
 export const Sidebar = ({
@@ -49,12 +48,6 @@ export const Sidebar = ({
           view={VIEWS.CAMERAS}
           label="Câmeras"
           icon={CameraIcon}
-        />
-
-        <NavLink
-          view={VIEWS.LIVE_FEED}
-          label="Live Feed"
-          icon={VideoCameraIcon}
         />
 
         <NavLink

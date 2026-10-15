@@ -1,6 +1,12 @@
 # Frontend - Guia de Execução
 
-Este é o frontend do projeto. Siga os passos abaixo para rodar localmente.
+Este é o frontend do projeto de monitoramento emocional e análise comportamental em tempo real.
+
+## ✨ Funcionalidades
+- **Dashboard Geral**: Visão consolidada de eventos, emoções detectadas e comportamentos em tempo real.
+- **Central de Monitoramento (Câmeras)**: Grade estilo central de segurança para múltiplas câmeras simultâneas, com suporte a streams MJPEG, controles de iniciar/parar e alternância de modo (Indivíduos e faces / Emoção geral da sala).
+- **Gestão de Usuários**: Cadastro organizacional de membros para acompanhamento de métricas.
+- **Relatórios Dinâmicos**: Gráficos e indicadores em tempo real consumindo agregações do MongoDB, com opção para exportação/impressão.
 
 ## 📦 Pré-requisitos
 
