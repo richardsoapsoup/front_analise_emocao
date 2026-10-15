@@ -8,6 +8,7 @@ import {
   UsersIcon,
   XMarkIcon,
   SignalIcon,
+  ShieldExclamationIcon,
 } from "@heroicons/react/24/outline";
 
 export const Sidebar = ({
@@ -18,6 +19,7 @@ export const Sidebar = ({
   VIEWS,
   mobileOpen = false,
   setMobileOpen = () => {},
+  alertCount = 0,
 }) => {
   const NavLink = ({ view, label, icon: Icon, badge }) => {
     const isActive = currentView === view;
@@ -99,6 +101,13 @@ export const Sidebar = ({
             view={VIEWS.CAMERAS}
             label="Central de Câmeras"
             icon={CameraIcon}
+          />
+
+          <NavLink
+            view={VIEWS.ALERTAS}
+            label="Alertas de Raiva"
+            icon={ShieldExclamationIcon}
+            badge={alertCount > 0 ? `${alertCount}` : null}
           />
 
           <NavLink
