@@ -65,47 +65,23 @@ export const CameraFormModal = ({ open, onClose, onSave, initialData }) => {
           />
         </label>
 
-        {/* Origem */}
+        {/* Origem / Link da câmera */}
         <div className="mb-4">
           <label className="block">
             <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-              Origem da Câmera *
+              Origem / link da câmera *
             </span>
             <input
               className="mt-1.5 w-full rounded-xl bg-gray-900 border border-gray-700 px-3.5 py-2.5 text-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono transition"
               value={form.origem}
               onChange={(e) => setForm({ ...form, origem: e.target.value })}
-              placeholder="0, 1, rtsp://..., http://..."
+              placeholder="0, rtsp://..., http://..."
               required
             />
           </label>
-
-          {/* Atalhos rápidos de origem */}
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-[11px] text-gray-400">Atalhos:</span>
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, origem: '0' })}
-              className={`text-[11px] px-2 py-0.5 rounded-md border transition ${
-                form.origem === '0'
-                  ? 'bg-indigo-600 text-white border-indigo-500'
-                  : 'bg-gray-700/60 text-gray-300 border-gray-600 hover:bg-gray-700'
-              }`}
-            >
-              Webcam 0 (Principal)
-            </button>
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, origem: '1' })}
-              className={`text-[11px] px-2 py-0.5 rounded-md border transition ${
-                form.origem === '1'
-                  ? 'bg-indigo-600 text-white border-indigo-500'
-                  : 'bg-gray-700/60 text-gray-300 border-gray-600 hover:bg-gray-700'
-              }`}
-            >
-              Webcam 1 (Secundária)
-            </button>
-          </div>
+          <p className="text-xs text-gray-400 mt-1.5">
+            Use <code className="text-indigo-400 bg-gray-900 px-1 py-0.5 rounded">0</code> para webcam local ou informe link RTSP/HTTP (ex.: <code className="text-gray-300">rtsp://...</code>).
+          </p>
         </div>
 
         {/* Modo padrão */}
